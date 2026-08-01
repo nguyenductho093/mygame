@@ -415,7 +415,23 @@
                 pushLog(msg + `THUA SẠCH`, '#ff3333');
             }
         }
-
+        // --- XỬ LÝ NHẠC NỀN ---
+        function toggleMusic() {
+            const music = document.getElementById("bgMusic");
+            const btn = document.getElementById("musicBtn");
+            if (music.paused) {
+                music.play();
+                btn.innerHTML = "🔇 Tắt Nhạc Nền";
+                btn.style.color = "#ff3333";
+                btn.style.borderColor = "#ff3333";
+            } else {
+                music.pause();
+                btn.innerHTML = "🎵 Bật Nhạc Nền";
+                btn.style.color = "#00ffff";
+                btn.style.borderColor = "#00ffff";
+            }
+        }
+        
         function gameLoop() {
             const now = Date.now();
             const startOfDay = new Date(new Date().setHours(0,0,0,0)).getTime();
