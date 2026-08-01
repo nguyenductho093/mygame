@@ -30,7 +30,7 @@
 <body>
 
     <div class="chat-container">
-        <div class="chat-header">Kênh Chat Thế Giới (Lưu trữ 200s)</div>
+        <div class="chat-header">Kênh Chat Thế Giới (Hiệu lực 10 phút)</div>
         <div class="chat-messages" id="chat-box"></div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." onkeypress="handleChatEnter(event)">
@@ -52,7 +52,7 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // Lấy tên user từ localStorage của trình duyệt (cùng domain nên iframe vẫn đọc được)
+        // Lấy tên user từ localStorage của trình duyệt
         function getCurrentUser() {
             return localStorage.getItem('online_user');
         }
@@ -67,12 +67,14 @@
                     let msg = child.val();
                     let age = now - msg.timestamp;
                     
-                    if (age < 200000) {
+                    // Lọc hiển thị: Chỉ hiện tin nhắn mới hơn 10 phút (600.000 ms)
+                    if (age < 600000) {
                         let div = document.createElement('div');
                         div.className = 'chat-msg';
                         div.innerHTML = `<span class="sender">[${msg.sender}]</span> ${msg.text}`;
                         chatBox.appendChild(div);
                     } else {
+                        // Xóa các tin nhắn quá hạn trên Firebase nếu ai đó đọc được
                         db.ref('global_chat/' + child.key).remove();
                     }
                 });
@@ -101,8 +103,8 @@
 
             input.value = '';
 
-            // Hẹn giờ cục bộ: Gửi lệnh xóa sau 200 giây
-            setTimeout(() => { chatRef.remove(); }, 200000); 
+            // Hẹn giờ cục bộ: Gửi lệnh xóa sau 10 phút (600.000 ms)
+            setTimeout(() => { chatRef.remove(); }, 600000); 
         }
 
         initGlobalChat();
