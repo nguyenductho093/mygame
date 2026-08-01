@@ -430,6 +430,22 @@
                 btn.style.color = "#00ffff";
                 btn.style.borderColor = "#00ffff";
             }
+                    // --- TỰ ĐỘNG PHÁT NHẠC KHI CHẠM/CLICK LẦN ĐẦU ---
+        document.addEventListener('click', function once() {
+            const music = document.getElementById("bgMusic");
+            const btn = document.getElementById("musicBtn");
+            if (music && music.paused) {
+                music.play().then(() => {
+                    if(btn) {
+                        btn.innerHTML = "🔇 Tắt Nhạc Nền";
+                        btn.style.color = "#ff3333";
+                        btn.style.borderColor = "#ff3333";
+                    }
+                }).catch(e => console.log("Trình duyệt vẫn chặn:", e));
+            }
+            document.removeEventListener('click', once);
+        }, { once: true });
+
         }
         
         function gameLoop() {
