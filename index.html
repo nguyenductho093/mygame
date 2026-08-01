@@ -362,9 +362,9 @@
                     let jk = rng() > 0.5 ? 10 : 100;
                     score = jk; category = jk === 10 ? 'Gà' : 'Ngỗng'; nổHũ = true;
                 } else {
-                    if (category === 'Gà') score = Math.floor(rng() * 30) + 11;
-                    else if (category === 'Vịt') score = Math.floor(rng() * 19) + 41;
-                    else if (category === 'Ngỗng') score = Math.floor(rng() * 40) + 60;
+                    if (category === 'Gà') score = Math.floor(rng() * 30) + 10;
+                    else if (category === 'Vịt') score = Math.floor(rng() * 30) + 40;
+                    else if (category === 'Ngỗng') score = Math.floor(rng() * 31) + 70;
                 }
 
                 if (i === targetRound) {
