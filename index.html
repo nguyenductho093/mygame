@@ -170,6 +170,15 @@
         🎉 NỔ HŨ 🎉<br><span style="font-size: 22px;" id="jackpot-msg"></span>
     </div>
 <iframe src="chat.html" style="width: 100%; max-width: 1000px; height: 350px; border: none; border-radius: 15px; margin-top: 20px;"></iframe>
+        <!-- Nút Bật/Tắt nhạc nền -->
+    <div style="text-align: center; margin-top: 15px;">
+        <audio id="bgMusic" loop>
+            <source src="nhac-nen.mp3" type="audio/mpeg">
+        </audio>
+        <button onclick="toggleMusic()" id="musicBtn" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #00ffff; background: rgba(0, 0, 0, 0.8); color: #00ffff; font-weight: bold; cursor: pointer; font-family: 'Orbitron', sans-serif;">
+            🎵 Bật Nhạc Nền
+        </button>
+    </div>
     
     <script>
         /* =========================================
