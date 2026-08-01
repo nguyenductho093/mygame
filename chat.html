@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', sans-serif; background: transparent; display: flex; justify-content: center; }
+        .chat-container {
+            width: 100%; background: rgba(10, 10, 10, 0.85); 
+            border: 1px solid #00ffff; border-radius: 15px; padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2); color: white;
+        }
+        .chat-header { font-size: 18px; font-weight: bold; color: #00ffff; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 10px; }
+        .chat-messages { height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; padding-right: 5px; }
+        .chat-msg { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; font-size: 14px; word-wrap: break-word; }
+        .chat-msg span.sender { font-weight: bold; color: #ffcc00; margin-right: 5px; }
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #555; background: #222; color: #fff; font-size: 15px; outline: none; }
+        .chat-input-area button { padding: 10px 20px; border-radius: 8px; border: none; background: #00ffff; color: #000; font-weight: bold; cursor: pointer; }
+        .chat-input-area button:hover { background: #00cccc; }
+        
+        /* Chỉnh thanh cuộn */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #00ffff; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">Kênh Chat Thế Giới (Tự hủy sau 200s)</div>
+        <div class="chat-messages" id="chat-box"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." onkeypress="handleChatEnter(event)">
+            <button onclick="sendChatMessage()">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdjd7qONQQuUAmkMK-rP-zCp06rnyRYks",
+            authDomain: "gamevn-f6cc8.firebaseapp.com",
+            databaseURL: "https://gamevn-f6cc8-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "gamevn-f6cc8",
+            storageBucket: "gamevn-f6cc8.firebasestorage.app",
+            messagingSenderId: "147617412521",
+            appId: "1:147617412521:web:8143e0c93823accc9480b8"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        // Lấy tên user từ localStorage của trình duyệt (cùng domain nên iframe vẫn đọc được)
+        function getCurrentUser() {
+            return localStorage.getItem('online_user');
+        }
+
+        function initGlobalChat() {
+            db.ref('global_chat').on('value', snap => {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML = '';
+                const now = Date.now();
+
+                snap.forEach(child => {
+                    let msg = child.val();
+                    let age = now - msg.timestamp;
+                    
+                    if (age < 200000) {
+                        let div = document.createElement('div');
+                        div.className = 'chat-msg';
+                        div.innerHTML = `<span class="sender">[${msg.sender}]</span> ${msg.text}`;
+                        chatBox.appendChild(div);
+                    } else {
+                        db.ref('global_chat/' + child.key).remove();
+                    }
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const currentUser = getCurrentUser();
+            if (!currentUser) return alert("Vui lòng đăng nhập ở màn hình chính để chat!");
+            
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatRef = db.ref('global_chat').push();
+            chatRef.set({
+                sender: currentUser,
+                text: text,
+                timestamp: Date.now()
+            });
+
+            input.value = '';
+
+            // Hẹn giờ cục bộ: Gửi lệnh xóa sau 200 giây
+            setTimeout(() => { chatRef.remove(); }, 200000); 
+        }
+
+        initGlobalChat();
+    </script>
+</body>
+</html>
