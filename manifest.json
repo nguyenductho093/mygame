@@ -1,6 +1,6 @@
 {
   "name": "My Game",
-  "short_name": "GaVitNgong",
+  "short_name": "My Game",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
