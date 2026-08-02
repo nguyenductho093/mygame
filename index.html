@@ -115,18 +115,18 @@
             <div style="margin: 15px 0; color: #fff; font-size: 14px;">
                 <p style="margin-bottom: 8px;">Chọn nhân vật của bạn:</p>
                 <div style="display: flex; justify-content: center; gap: 20px;">
-                    <label style="cursor: pointer; text-align: center;">
-                        <input type="radio" name="reg_avatar" value="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" checked style="display: none;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" width="55" height="55" style="border-radius: 50%; border: 3px solid #ffcc00; background: #fff; transition: 0.2s;" class="avatar-option">
-                        <div style="margin-top: 5px; font-weight: bold;">Nam</div>
-                    </label>
-                    
-                    <label style="cursor: pointer; text-align: center;">
-                        <input type="radio" name="reg_avatar" value="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" style="display: none;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" width="55" height="55" style="border-radius: 50%; border: 3px solid transparent; background: #fff; transition: 0.2s;" class="avatar-option">
-                        <div style="margin-top: 5px; font-weight: bold;">Nữ</div>
-                    </label>
-                </div>
+                        <label style="cursor: pointer; text-align: center;">
+        <input type="radio" name="reg_avatar" value="nam.jpg" checked>
+        <img src="nam.jpg" width="55" height="55" style="border-radius: 50%; border: 2px solid #00ffff;">
+        <div style="margin-top: 5px; font-weight: bold;">Nam</div>
+    </label>
+
+    <label style="cursor: pointer; text-align: center;">
+        <input type="radio" name="reg_avatar" value="nu.jpg">
+        <img src="nu.jpg" width="55" height="55" style="border-radius: 50%; border: 2px solid #ff66cc;">
+        <div style="margin-top: 5px; font-weight: bold;">Nữ</div>
+    </label>
+
             </div>
             <!-- KẾT THÚC KHU VỰC CHỌN NHÂN VẬT -->
             
@@ -149,8 +149,8 @@
     <div class="header-info">
         <!-- Bọc ảnh và tên vào một thẻ flex để nó nằm ngang nhau -->
         <div style="display: flex; align-items: center; gap: 10px;">
-            <img id="display-avatar" src="" width="45" height="45" style="border-radius: 50%; border: 2px solid #ffcc00; display: none;">
-            
+            <img id="display-avatar" src="nam.jpg" width="45" height="45" style="border-radius: 50%; border: 2px solid #ffcc00; display: none;">
+    
             <div class="user-meta">
                 <div>Người chơi: <span id="ui-username" style="color: #00ffff;">----</span></div>
                 <div>Số dư: <span class="balance" id="ui-balance">0</span> VNĐ</div>
