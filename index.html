@@ -300,7 +300,7 @@
         function initSessiion() {
     if (!currentUser) { document.getElementById('auth-modal').style.display = 'flex'; return; }
     document.getElementById('auth-modal').style.display = 'none';
-    document.getElementById('us-username').innerText = currentUser;
+    document.getElementById('ui-username').innerText = currentUser;
 
     // --- KÍCH HOẠT NÚT ADMIN KHI LÀ NDT999 ---
     const btnAdmin = document.getElementById('btn-open-admin');
