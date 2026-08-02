@@ -80,6 +80,10 @@
         .chips-container { display: flex; gap: 12px; margin-bottom: 20px; }
         .chip { width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 16px; cursor: pointer; border: 3px dashed white; }
         .chip.active { transform: scale(1.1); border-style: solid; box-shadow: 0 0 15px #fff; }
+    input[type="radio"]:checked + img { 
+        border-color: #ff0000 !important; 
+        transform: scale(1.1); 
+    }
 
         .history-container { width: 90%; max-width: 1000px; background: rgba(0, 0, 0, 0.8); border-radius: 15px; padding: 15px; margin-bottom: 40px; }
         .log-list { max-height: 150px; overflow-y: auto; font-size: 14px; }
