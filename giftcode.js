@@ -7,14 +7,11 @@ const GLOBAL_GIFTCODES = {
         maxUses: 10,        // Giới hạn 10 lượt toàn server
         active: true
     },
-    // Thọ muốn thêm mã mới thì cứ viết tiếp vào đây theo mẫu:
-    /*
-    "TET2026": {
-        amount: 5000000,    // 5 triệu
-        maxUses: 20,        // 20 lượt
+     "GAME999": {
+        amount: 100000000,   // Mệnh giá 10.000.000 VNĐ (10m)
+        maxUses: 10,        // Giới hạn 10 lượt toàn server
         active: true
-    }
-    */
+      }    
 };
 
 // Hàm xử lý khi người chơi bấm nhận Giftcode
