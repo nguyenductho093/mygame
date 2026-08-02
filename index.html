@@ -170,6 +170,14 @@
     <div class="jackpot-popup" id="jackpot-popup">
         🎉 NỔ HŨ 🎉<br><span style="font-size: 22px;" id="jackpot-msg"></span>
     </div>
+<!-- LỊCH SỬ QUAY -->
+<div style="text-align: center; margin: 15px auto; padding: 10px; background: #1a1a1a; border-radius: 8px; width: 100%; max-width: 1000px;">
+    <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">LỊCH SỬ 10 PHIÊN GẦN NHẤT</div>
+    <div id="ui-history" style="display: flex; justify-content: center; gap: 8px;">
+        <!-- Các chấm kết quả sẽ hiện ở đây -->
+    </div>
+</div>
+
 <iframe src="chat.html" style="width: 100%; max-width: 1000px; height: 350px; border: none; border-radius: 15px; margin-top: 20px;"></iframe>
         <!-- Nút Bật/Tắt nhạc nền -->
     <div style="text-align: center; margin-top: 15px;">
@@ -202,7 +210,31 @@
         let currentUser = localStorage.getItem('online_user');
         let currentBalance = 0;
         let dbBalanceListener = null;
+        function updateHistory(currentRound) {
+            const historyContainer = document.getElementById('ui-history');
+            if (!historyContainer) return;
+            historyContainer.innerHTML = ''; 
 
+            for (let i = 10; i >= 1; i--) {
+                let pastRound = currentRound - i;
+                if (pastRound < 0) continue; 
+
+                let state = getGameState(pastRound); 
+                let color = '';
+                let text = '';
+
+                if (state.category === 'Gà') { color = '#ff9900'; text = 'G'; }
+                else if (state.category === 'Vịt') { color = '#33ccff'; text = 'V'; }
+                else if (state.category === 'Ngỗng') { color = '#ff33cc'; text = 'N'; }
+
+                let dot = document.createElement('div');
+                dot.style.cssText = `width: 26px; height: 26px; line-height: 26px; border-radius: 50%; background: ${color}; color: #fff; font-size: 12px; font-weight: bold; text-align: center; box-shadow: 0 0 5px rgba(0,0,0,0.5);`;
+                dot.innerText = text;
+                
+                historyContainer.appendChild(dot);
+            }
+        }
+            
         // --- HỆ THỐNG AUTH ONLINE ---
         function switchAuthForm(type) {
             document.getElementById('auth-login-box').style.display = type === 'login' ? 'block' : 'none';
@@ -472,8 +504,10 @@
                     previousState = targetState;
                 }
 
-                activeRound = round; targetState = getGameState(round); isRolling = false;
-                bets = { 'Gà': 0, 'Vịt': 0, 'Ngỗng': 0 };
+                        activeRound = round; targetState = getGameState(round); isRolling = false;
+               updateHistory(round);
+               bets = { 'Gà': 0, 'Vịt': 0, 'Ngỗng': 0 };
+
                 ['Gà', 'Vịt', 'Ngỗng'].forEach(k => document.getElementById(`bet-${k}`).innerText = '0');
 
                 if (!previousState) {
