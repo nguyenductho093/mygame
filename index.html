@@ -107,6 +107,25 @@
             <h2>ĐĂNG KÝ (ONLINE)</h2>
             <input type="text" id="reg-username" placeholder="Tên tài khoản mới">
             <input type="password" id="reg-password" placeholder="Mật khẩu">
+                        <!-- KHU VỰC CHỌN NHÂN VẬT -->
+            <div style="margin: 15px 0; color: #fff; font-size: 14px;">
+                <p style="margin-bottom: 8px;">Chọn nhân vật của bạn:</p>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <label style="cursor: pointer; text-align: center;">
+                        <input type="radio" name="reg_avatar" value="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" checked style="display: none;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" width="55" height="55" style="border-radius: 50%; border: 3px solid #ffcc00; background: #fff; transition: 0.2s;" class="avatar-option">
+                        <div style="margin-top: 5px; font-weight: bold;">Nam</div>
+                    </label>
+                    
+                    <label style="cursor: pointer; text-align: center;">
+                        <input type="radio" name="reg_avatar" value="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" style="display: none;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" width="55" height="55" style="border-radius: 50%; border: 3px solid transparent; background: #fff; transition: 0.2s;" class="avatar-option">
+                        <div style="margin-top: 5px; font-weight: bold;">Nữ</div>
+                    </label>
+                </div>
+            </div>
+            <!-- KẾT THÚC KHU VỰC CHỌN NHÂN VẬT -->
+            
             <button onclick="register()">Tạo Tài Khoản (+5M VNĐ)</button>
             <div class="auth-switch" onclick="switchAuthForm('login')">Đã có tài khoản? <span>Đăng nhập</span></div>
         </div>
@@ -124,11 +143,16 @@
     </div>
 
     <div class="header-info">
-        <div class="user-meta">
-            <div>Người chơi: <span id="ui-username" style="color: #00ffff;">---</span></div>
-            <div>Số dư: <span class="balance" id="ui-balance">0</span> VNĐ</div>
+        <!-- Bọc ảnh và tên vào một thẻ flex để nó nằm ngang nhau -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img id="display-avatar" src="" width="45" height="45" style="border-radius: 50%; border: 2px solid #ffcc00; display: none;">
+            
+            <div class="user-meta">
+                <div>Người chơi: <span id="ui-username" style="color: #00ffff;">----</span></div>
+                <div>Số dư: <span class="balance" id="ui-balance">0</span> VNĐ</div>
+            </div>
         </div>
-        <div>
+
             <span>Lượt: <span id="ui-round">---</span></span>
             <button class="btn-action" style="background: #ff9900; color: #000;" onclick="openTransferModal()">Chuyển Tiền</button>
             <button class="btn-action" style="background: #ff3333; color: #fff;" onclick="logout()">Đăng Xuất</button>
@@ -246,38 +270,52 @@
             document.getElementById('auth-register-box').style.display = type === 'register' ? 'block' : 'none';
         }
 
-        async function register() {
+                async function register() {
             const user = document.getElementById('reg-username').value.trim();
             const pass = document.getElementById('reg-password').value.trim();
-            if(!user || !pass) return alert("Nhập đủ thông tin!");
+            
+            // Lấy link ảnh avatar nhân vật Nam/Nữ mà người dùng đã chọn
+            const avatarSelected = document.querySelector('input[name="reg_avatar"]:checked').value;
+        if(!user || !pass) return alert("Nhập đủ thông tin!");
 
             const snapshot = await db.ref('users/' + user).once('value');
             if (snapshot.exists()) return alert("Tên tài khoản này đã có người đăng ký!");
 
+            // Lưu tài khoản kèm theo trường avatar lên Firebase
             await db.ref('users/' + user).set({
                 password: pass,
                 balance: 5000000,
-                createdAt: Date.now()
+                createdAt: Date.now(),
+                avatar: avatarSelected 
             });
             alert("Đăng ký thành công mạng Online! Nhận 5M VNĐ.");
             switchAuthForm('login');
         }
 
-        async function login() {
+
+                async function login() {
             const user = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-password').value.trim();
-            
+
             const snapshot = await db.ref('users/' + user).once('value');
             if (!snapshot.exists()) return alert("Tài khoản không tồn tại!");
-            
+
             const userData = snapshot.val();
             if (userData.password !== pass) return alert("Sai mật khẩu!");
 
             currentUser = user;
+            currentBalance = userData.balance;
+            
+            // Lấy và hiển thị avatar đã lưu khi đăng nhập thành công
+            const userAvatar = userData.avatar || "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
+            document.getElementById('display-avatar').src = userAvatar;
+            document.getElementById('display-avatar').style.display = 'block';
+
             localStorage.setItem('online_user', currentUser);
             document.getElementById('auth-modal').style.display = 'none';
             initSession();
         }
+
 
         function logout() {
             if(dbBalanceListener && currentUser) db.ref('users/' + currentUser + '/balance').off('value', dbBalanceListener);
