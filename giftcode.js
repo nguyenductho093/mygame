@@ -1,57 +1,54 @@
-// --- QUẢN LÝ HỆ THỐNG GIFTCODE RIÊNG BIỆT ---
+// --- QUẢN LÝ HỆ THỐNG GIFTCODE ---
 
-// Thọ có thể chỉnh sửa, thêm bớt danh sách các mã code tại đây cực kỳ dễ dàng
 const GLOBAL_GIFTCODES = {
-    "THO2026": {
-        amount: 100000000,   // Mệnh giá 10.000.000 VNĐ (10m)
-        maxUses: 10,        // Giới hạn 10 lượt toàn server
+    "GAMEVUI999": {
+        amount: 10000000, 
+        maxUses: 10,      
         active: true
     },
-     "GAME9999": {
-        amount: 100000000,   // Mệnh giá 10.000.000 VNĐ (10m)
-        maxUses: 10,        // Giới hạn 10 lượt toàn server
+    "GAMEHAY999": {
+        amount: 10000000, 
+        maxUses: 10,      
         active: true
-      }    
+    }
 };
 
-// Hàm xử lý khi người chơi bấm nhận Giftcode
 function claimGiftcode() {
     const codeInput = document.getElementById('giftcode-input');
     if (!codeInput) return;
-
-    // Chuyển chữ thường thành chữ hoa và loại bỏ khoảng trắng
-    const code = codeInput.value.trim().toUpperCase();
     
+    const code = codeInput.value.trim().toUpperCase();
     if (!code) {
         alert("Vui lòng nhập mã Giftcode!");
         return;
     }
 
-    // Kiểm tra đăng nhập
     if (typeof currentUser === 'undefined' || !currentUser) {
         alert("Vui lòng đăng nhập trước khi nhận quà!");
         return;
     }
 
-    // Kiểm tra xem mã có nằm trong danh sách quản lý ở trên không
+    // ĐÃ SỬA: Thêm dấu ! để kiểm tra đúng điều kiện mã không tồn tại
     if (!GLOBAL_GIFTCODES.hasOwnProperty(code)) {
         alert("Mã Giftcode không tồn tại!");
         return;
     }
 
-    const codeConfig = GLOBAL_GIFTCODES[code];
-    if (!codeConfig.active) {
+    const giftConfig = GLOBAL_GIFTCODES[code];
+    if (!giftConfig.active) {
         alert("Mã Giftcode này đã tạm khóa!");
         return;
     }
 
-    const userId = currentUser.uid;
+    // ĐÃ SỬA: Hỗ trợ cả trường hợp currentUser là string hoặc object
+    const userId = (typeof currentUser === 'object' && currentUser !== null) ? currentUser.uid : currentUser;
+    
     const db = firebase.database();
     const codeRef = db.ref('giftcodes/' + code);
-    const userClaimedRef = db.ref('users/' + userId + '/claimedCodes/' + code);
+    const userClaimRef = db.ref('users/' + userId + '/claimedCodes/' + code);
 
     // 1. Kiểm tra lịch sử người dùng đã nhập chưa
-    userClaimedRef.once('value', (claimedSnap) => {
+    userClaimRef.once('value', (claimedSnap) => {
         if (claimedSnap.exists()) {
             alert("Bạn đã sử dụng mã Giftcode này rồi, không thể nhận lại!");
             return;
@@ -60,19 +57,15 @@ function claimGiftcode() {
         // 2. Kiểm tra và cập nhật lượt trên Firebase (Chống tranh chấp bằng Transaction)
         codeRef.transaction((currentData) => {
             if (!currentData) {
-                // Nếu trên Firebase chưa có node này, khởi tạo mặc định từ file cấu hình
-                currentData = {
+                return {
                     currentUses: 0,
-                    maxUses: codeConfig.maxUses,
-                    amount: codeConfig.amount
+                    maxUses: giftConfig.maxUses,
+                    amount: giftConfig.amount
                 };
             }
-
-            // Kiểm tra giới hạn toàn server
             if (currentData.currentUses >= currentData.maxUses) {
-                return; // Hết lượt, hủy transaction
+                return; // Hết lượt
             }
-
             currentData.currentUses++;
             return currentData;
         }, (error, committed, snapshot) => {
@@ -82,19 +75,28 @@ function claimGiftcode() {
                 alert("Mã Giftcode này đã hết lượt sử dụng trên toàn server!");
             } else {
                 // Thành công: Đánh dấu user đã nhận mã này
-                userClaimedRef.set(true);
+                userClaimRef.set(true);
 
-                const rewardAmount = codeConfig.amount;
+                const rewardAmount = giftConfig.amount;
                 const userBalanceRef = db.ref('users/' + userId + '/balance');
 
-                // Cộng tiền vào tài khoản người chơi
+                // Cộng tiền vào tài khoản người chơi trên Firebase
                 userBalanceRef.transaction((currentBalance) => {
                     return (currentBalance || 0) + rewardAmount;
                 }, (balErr, balCommitted) => {
                     if (balCommitted) {
                         codeInput.value = ''; // Xóa ô nhập
-                        
-                        // Gọi thông báo nổi "ting ting" nếu đã tích hợp notification.js
+
+                        // Cập nhật biến số dư và giao diện ngay lập tức nếu có
+                        if (typeof currentBalance !== 'undefined') {
+                            currentBalance += rewardAmount;
+                        }
+                        const balanceEl = document.getElementById('ui-balance');
+                        if (balanceEl) {
+                            balanceEl.innerText = (typeof currentBalance !== 'undefined' ? currentBalance : rewardAmount).toLocaleString();
+                        }
+
+                        // Gọi thông báo nổi "Ting ting"
                         if (typeof showMoneyToast === 'function') {
                             showMoneyToast(`Nhận thành công ${rewardAmount.toLocaleString()} VNĐ từ Giftcode: ${code}!`);
                         } else {
@@ -106,4 +108,3 @@ function claimGiftcode() {
         });
     });
 }
-
