@@ -551,5 +551,38 @@
         initSession();
         requestAnimationFrame(gameLoop);
     </script>
+        <!-- Nhúng file quản trị admin.js -->
+    <script src="admin.js"></script>
+
+    <!-- BẢNG QUẢN TRỊ ADMIN (NDT999) -->
+    <div id="admin-dashboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; overflow-y: auto; padding: 20px; font-family: 'Orbitron', sans-serif;">
+        <div style="max-width: 800px; margin: 30px auto; background: #111; border: 2px solid #00ffcc; border-radius: 15px; padding: 25px; color: #fff; box-shadow: 0 0 20px rgba(0,255,204,0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 style="color: #00ffcc; margin: 0;">🛡️ TRANG QUẢN TRỊ ADMIN (NDT999)</h2>
+                <button onclick="closeAdminPanel()" style="background: #ff4d4d; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">Đóng [X]</button>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <p style="color: #aaa;">Danh sách toàn bộ tài khoản và số dư đang hoạt động:</p>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; background: #1a1a1a;">
+                    <thead>
+                        <tr style="background: #00ffcc; color: #000;">
+                            <th style="padding: 10px; border: 1px solid #333;">Tài khoản</th>
+                            <th style="padding: 10px; border: 1px solid #333;">Số dư hiện tại</th>
+                            <th style="padding: 10px; border: 1px solid #333;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-user-list">
+                        <tr><td colspan="3" style="text-align: center; padding: 15px;">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NÚT MỞ BẢNG ADMIN -->
+    <button id="btn-open-admin" onclick="openAdminPanel()" style="display: none; position: fixed; bottom: 20px; left: 20px; background: #00ffcc; color: #000; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; z-index: 999; box-shadow: 0 0 10px rgba(0,255,204,0.6);">⚙️ Mở Bảng Admin</button>
+    
 </body>
 </html>
