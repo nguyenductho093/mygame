@@ -326,7 +326,8 @@
                     div.innerText = l.msg;
                     logBoard.appendChild(div);
                 });
-            });
+          listenForTransactions(currentUser);
+                
         }
 
         // Lưu log lên Firebase
