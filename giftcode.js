@@ -3,12 +3,12 @@
 const GLOBAL_GIFTCODES = {
     "GAMEVUI999": {
         amount: 10000000, 
-        maxUses: 10,      
+        maxUses: 100,      
         active: true
     },
     "GAMEHAY999": {
         amount: 10000000, 
-        maxUses: 10,      
+        maxUses: 100,      
         active: true
     }
 };
