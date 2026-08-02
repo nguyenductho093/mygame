@@ -2,12 +2,12 @@
 
 // Thọ có thể chỉnh sửa, thêm bớt danh sách các mã code tại đây cực kỳ dễ dàng
 const GLOBAL_GIFTCODES = {
-    "THO2027": {
+    "THO2026": {
         amount: 100000000,   // Mệnh giá 10.000.000 VNĐ (10m)
         maxUses: 10,        // Giới hạn 10 lượt toàn server
         active: true
     },
-     "GAME999": {
+     "GAME9999": {
         amount: 100000000,   // Mệnh giá 10.000.000 VNĐ (10m)
         maxUses: 10,        // Giới hạn 10 lượt toàn server
         active: true
