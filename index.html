@@ -189,6 +189,11 @@
 </div>
 
 <iframe src="chat.html" style="width: 100%; max-width: 1000px; height: 350px; border: none; border-radius: 15px; margin-top: 20px;"></iframe>
+      <!-- KHUNG NHẬP GIFTCODE -->
+<div style="text-align: center; margin: 15px auto;">
+    <input type="text" id="giftcode-input" placeholder="Nhập mã giftcode" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #00ffcc; background: #111; color: #fff; font-family: 'Orbitron', sans-serif; text-transform: uppercase; outline: none;">
+    <button onclick="claimGiftcode()" style="padding: 8px 15px; border-radius: 8px; border: none; background: linear-gradient(135deg, #00ffcc, #00b386); color: #000; font-weight: bold; cursor: pointer; font-family: 'Orbitron', sans-serif; margin-left: 5px;">Đổi Thưởng</button>
+</div>
         <!-- Nút Bật/Tắt nhạc nền -->
     <div style="text-align: center; margin-top: 15px;">
         <audio id="bgMusic" loop autoplay>
@@ -198,7 +203,9 @@
             🎵 Bật Nhạc Nền
         </button>
     </div>
-    
+      <!-- Nhúng 2 file tính năng vào đây -->
+    <script src="notification.js"></script>
+    <script src="giftcode.js"></script>
     <script>
         /* =========================================
            BƯỚC 2: DÁN CẤU HÌNH FIREBASE CỦA BẠN VÀO ĐÂY
@@ -317,6 +324,7 @@
                     logBoard.appendChild(div);
                 });
             });
+             listenForTransactions(currentUser);
         }
 
         // Lưu log lên Firebase
