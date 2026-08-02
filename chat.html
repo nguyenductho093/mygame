@@ -67,7 +67,7 @@
                     let msg = child.val();
                     let age = now - msg.timestamp;
                     
-                    // Lọc hiển thị: Chỉ hiện tin nhắn mới hơn 12 giờ (43.200.000 ms)
+                    // Lọc hiển thị: Chỉ hiện tin nhắn mới hơn 12 giờ (40.000.000 ms)
                     if (age < 43200000) {
                         let div = document.createElement('div');
                         div.className = 'chat-msg';
@@ -103,7 +103,7 @@
 
             input.value = '';
 
-            // Hẹn giờ cục bộ: Gửi lệnh xóa sau 12 giờ (43.200.000 ms)
+            // Hẹn giờ cục bộ: Gửi lệnh xóa sau 12 giờ (40.000.000 ms)
             setTimeout(() => { chatRef.remove(); }, 43200000); 
         }
 
