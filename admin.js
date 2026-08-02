@@ -1,14 +1,29 @@
-// Kiểm tra nếu là tài khoản ndt999 thì cấp quyền và hiện nút Admin
+// --- FILE: admin.js ---
+
+// Kiểm tra quyền và tự động kích hoạt giao diện Admin cho tài khoản ndt999
 function checkAdminAccount(username) {
     if (username === 'ndt999') {
-        // Cấp số dư khủng vào đúng nhánh gốc ndt999/balance
-        firebase.database().ref('ndt999/balance').set(999999999999);
+        // Cấp thêm số dư hoặc khởi tạo dữ liệu admin nếu cần
+        firebase.database().ref('ndt999/balance').transaction((current) => {
+            return current || 5000000;
+        });
         
-        // Hiện nút mở bảng quản trị
+        // Hiện nút mở bảng quản trị ngay lập tức khi đúng tài khoản ndt999
         const btnAdmin = document.getElementById('btn-open-admin');
-        if (btnAdmin) btnAdmin.style.display = 'block';
+        if (btnAdmin) {
+            btnAdmin.style.display = 'block';
+        }
     }
 }
+
+// Tự động quét kiểm tra ngay khi trang web vừa tải xong
+window.addEventListener('DOMContentLoaded', () => {
+    // Lấy thông tin currentUser từ localStorage hoặc biến toàn cục của game
+    const savedUser = localStorage.getItem('currentUser') || window.currentUser;
+    if (savedUser === 'ndt999') {
+        checkAdminAccount('ndt999');
+    }
+});
 
 // Mở bảng quản trị và load dữ liệu real-time theo nhánh gốc
 function openAdminPanel() {
@@ -17,7 +32,6 @@ function openAdminPanel() {
 
     const tbody = document.getElementById('admin-user-list');
     
-    // Đọc toàn bộ dữ liệu ở thư mục gốc (hoặc nếu có nhiều user ở gốc)
     firebase.database().ref('/').on('value', (snapshot) => {
         tbody.innerHTML = '';
         if (!snapshot.exists()) {
@@ -29,7 +43,7 @@ function openAdminPanel() {
             const username = childSnap.key;
             const userData = childSnap.val();
             
-            // Chỉ lấy các node là tài khoản user (có chứa balance)
+            // Chỉ lấy các node có chứa thuộc tính balance (tài khoản người chơi)
             if (userData && typeof userData === 'object' && 'balance' in userData) {
                 const balance = userData.balance ? Number(userData.balance).toLocaleString() : '0';
 
@@ -52,7 +66,7 @@ function closeAdminPanel() {
     if (modal) modal.style.display = 'none';
 }
 
-// Cộng tiền nhanh cho user bất kỳ theo nhánh gốc
+// Cộng tiền nhanh cho user bất kỳ
 function adminAddMoney(targetUser) {
     const amountStr = prompt(`Nhập số tiền muốn cộng cho ${targetUser}:`, "10000000");
     if (!amountStr) return;
