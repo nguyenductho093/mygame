@@ -4,11 +4,9 @@
 
 const GEMINI_API_KEY = "AQ.Ab8RN6K3DrM1BLWRrEZuqEehSXQOCQ3KN6n74Dd1QRZtvKD0PA"; 
 
-// 1. Hàm gửi tin nhắn cho Gemini và nhận kết quả
 async function askGemini(userMessage) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
     
-    // "Bơm" thông tin để định hình tính cách cho AI
     const systemPrompt = `Bạn là 'AI TRỢ LÝ - Thọ', một trợ lý ảo cực kỳ thông minh, vui tính và hài hước trong tựa game cá cược Gà - Vịt - Ngỗng. 
     Chủ nhân của bạn (admin) là Thọ (tài khoản ndt999). 
     Hãy trả lời ngắn gọn (dưới 50 chữ), thân thiện và dùng nhiều emoji. 
@@ -28,35 +26,34 @@ async function askGemini(userMessage) {
         });
         const data = await response.json();
         
-        // Trích xuất câu trả lời từ Gemini
-        return data.candidates[0].content.parts[0].text;
+        if (data.candidates && data.candidates.length > 0) {
+            return data.candidates[0].content.parts[0].text;
+        } else {
+            return "AI đang lú chút, Thọ hỏi lại nha! 🤖";
+        }
     } catch (error) {
-        console.error("Lỗi khi gọi Gemini:", error);
-        return "Xin lỗi, đường truyền từ vũ trụ AI đang bị nghẽn, lát chat sau nha! 😅";
+        console.error("Lỗi kết nối Gemini:", error);
+        return "Mạng mẽo thế nào ấy, không gọi được AI! 😅";
     }
 }
 
-// 2. Lắng nghe kênh chat và phản hồi
 db.ref('global_chat').on('child_added', async snap => {
     const data = snap.val();
-    
-    // Không để AI tự trả lời chính nó (tránh kẹt vòng lặp)
-    if (data.sender === 'AI TRỢ LÝ - Thọ') return;
+    // Kiểm tra dữ liệu: dùng data.text thay vì data.msg
+    if (!data || !data.text || data.sender === 'AI TRỢ LÝ - Thọ') return;
 
-    const text = data.msg.toLowerCase();
+    const messageText = data.text.toLowerCase().trim();
     
-    // ĐIỀU KIỆN KÍCH HOẠT: Chỉ gọi AI khi có người nhắn kèm từ khóa "@bot", "trợ lý", hoặc "ai"
-    if (text.includes("@bot") || text.includes("trợ lý") || text.includes("ai")) {
+    // Điều kiện kích hoạt khi gõ @bot, @ai hoặc chứa từ khóa
+    if (messageText.startsWith("@bot") || messageText.startsWith("@ai") || messageText.includes("trợ lý") || messageText.includes("ai ơi")) {
         
-        // Gọi Gemini
-        const aiResponse = await askGemini(data.msg);
+        const aiResponse = await askGemini(data.text);
         
-        // Đẩy câu trả lời của Gemini lên Firebase
+        // Đẩy phản hồi lên Firebase theo đúng chuẩn cấu trúc text
         db.ref('global_chat').push({
             sender: 'AI TRỢ LÝ - Thọ',
-            msg: aiResponse,
-            color: '#FFD700', // Màu Vàng Gold sang trọng cho AI
-            time: Date.now()
+            text: aiResponse,
+            timestamp: Date.now()
         });
     }
 });
