@@ -1,22 +1,25 @@
-// ==========================================
-// FILE: ai-bot.js (Bot tự động trả lời siêu vui tươi cho Kênh Thế Giới)
-// ==========================================
+// ==========================================================================
+// FILE: ai-bot.js (Bot Tự Động Kênh Thế Giới - Phiên Bản Hoàn Chỉnh & Thông Minh)
+// ==========================================================================
 
-// Biến ghi nhớ thời điểm tin nhắn cuối cùng bot xử lý để tránh bị lặp
-let lastProcessedTimestamp = 0;
+// Ghi lại thời điểm trang vừa được load để ngăn bot trả lời dồn dập các tin cũ
+const pageLoadTime = Date.now();
+
+// Thời gian tự động xóa tin nhắn của bot (tính bằng mili-giây): 60 giây = 60000 ms
+const BOT_MESSAGE_LIFETIME = 60000; 
 
 db.ref('global_chat').on('child_added', async snap => {
+    const messageKey = snap.key; // Lấy ID duy nhất của tin nhắn trên Firebase
     const data = snap.val();
+    
+    // Kiểm tra tính hợp lệ: Nếu không có dữ liệu, thiếu nội dung, hoặc do chính bot gửi thì bỏ qua
     if (!data || !data.text || data.sender === 'AI TRỢ LÝ - Thọ') return;
 
-    // Nếu tin nhắn này cũ hơn hoặc bằng tin nhắn mới nhất bot vừa xử lý thì bỏ qua ngay
+    // Nếu tin nhắn này có trước thời điểm load trang thì bỏ qua (chống lỗi dồn tin khi load lại trang)
     const msgTime = data.timestamp || 0;
-    if (msgTime <= lastProcessedTimestamp) return;
+    if (msgTime < pageLoadTime) return;
 
-    // Cập nhật lại mốc thời gian mới nhất đã xử lý
-    lastProcessedTimestamp = msgTime;
-
-    // Danh sách các câu động viên với nhiều icon vui tươi, ấm áp
+    // Danh sách các câu động viên, tương tác vui tươi và ấm áp
     const botReplies = [
         "hôm nay thế nào, bạn thật đáng yêu! ❤️✨🎉",
         "chúc bạn may mắn cả ngày nhé! 🍀🌟🚀",
@@ -45,10 +48,19 @@ db.ref('global_chat').on('child_added', async snap => {
     // Chọn ngẫu nhiên 1 câu từ danh sách
     const randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
 
-    // Gửi phản hồi lên Firebase
-    db.ref('global_chat').push({
+    // Đẩy phản hồi của bot lên Firebase Realtime Database
+    const newBotMsgRef = db.ref('global_chat').push({
         sender: 'AI TRỢ LÝ - Thọ',
         text: randomReply,
         timestamp: Date.now()
     });
+
+    // Thiết lập đồng hồ đếm ngược 60 giây để XÓA RIÊNG tin nhắn của bot khỏi Firebase
+    // Hoàn toàn không tác động hay ảnh hưởng gì đến tin nhắn của người dùng
+    setTimeout(() => {
+        newBotMsgRef.remove()
+            .catch(error => {
+                console.error("Không thể xóa tin nhắn của bot:", error);
+            });
+    }, BOT_MESSAGE_LIFETIME);
 });
