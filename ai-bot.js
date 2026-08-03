@@ -1,59 +1,26 @@
 // ==========================================
-// FILE: ai-bot.js (AI Trợ Lý cho Kênh Thế Giới)
+// FILE: ai-bot.js (Bot tự động trả lời cho Kênh Thế Giới)
 // ==========================================
-
-const GEMINI_API_KEY = "AQ.Ab8RN6J2YthuZTkM4Sl1q_4mQEK4PoaBodsVLYHfjnDh1RGm-w"; 
-
-async function askGemini(userMessage) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
-    const systemPrompt = `Bạn là 'AI TRỢ LÝ - Thọ', trợ lý ảo thông minh, vui tính trong game cá cược. Hãy trả lời ngắn gọn (dưới 50 chữ) và dùng emoji. Câu hỏi: "${userMessage}"`;
-
-    const requestBody = {
-        contents: [{
-            parts: [{ text: systemPrompt }]
-        }]
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody)
-        });
-        
-        const data = await response.json();
-        
-        if (data.error) {
-            console.error("Lỗi từ Google API:", data.error.message);
-            return `Lỗi API: ${data.error.message}`;
-        }
-
-        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
-            return data.candidates[0].content.parts[0].text;
-        } else {
-            return "AI đang lú chút, hỏi lại nha! 🤖";
-        }
-    } catch (error) {
-        console.error("Lỗi mạng khi fetch:", error);
-        return "Lỗi kết nối mạng tới Google API! 😅";
-    }
-}
 
 db.ref('global_chat').on('child_added', async snap => {
     const data = snap.val();
     if (!data || !data.text || data.sender === 'AI TRỢ LÝ - Thọ') return;
 
-    const messageText = data.text.toLowerCase().trim();
-    
-    if (messageText.startsWith("@bot") || messageText.startsWith("@ai") || messageText.includes("trợ lý") || messageText.includes("ai ơi")) {
-        
-        const aiResponse = await askGemini(data.text);
-        
-        db.ref('global_chat').push({
-            sender: 'AI TRỢ LÝ - Thọ',
-            text: aiResponse,
-            timestamp: Date.now()
-        });
-    }
+    // Danh sách 4 câu trả lời cố định theo ý Thọ
+    const botReplies = [
+        "hôm nay thế nào, bạn thật đáng yêu! ❤️",
+        "chúc bạn may mắn cả ngày nhé! 🍀",
+        "Bạn thật tuyệt vời! mạnh dạn lên đi, 😄",
+        "hôm nay có gì buồn à, yên tâm tôi sẽ luôn bên bạn mà! 🤗"
+    ];
+
+    // Chọn ngẫu nhiên 1 trong 4 câu trả lời
+    const randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
+
+    // Đẩy phản hồi của bot lên Firebase để hiển thị vào khung chat
+    db.ref('global_chat').push({
+        sender: 'AI TRỢ LÝ - Thọ',
+        text: randomReply,
+        timestamp: Date.now()
+    });
 });
