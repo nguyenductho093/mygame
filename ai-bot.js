@@ -2,7 +2,7 @@
 // FILE: ai-bot.js (AI Trợ Lý cho Kênh Thế Giới)
 // ==========================================
 
-const GEMINI_API_KEY = "AQ.Ab8RN6K3DrM1BLWRrEZuqEehSXQOCQ3KN6n74Dd1QRZtvKD0PA"; 
+const GEMINI_API_KEY = "AQ.Ab8RN6LawGMelsmH9OKwpKG4TKhirJp_cxk7M5yU119e7uo0ew"; 
 
 async function askGemini(userMessage) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
