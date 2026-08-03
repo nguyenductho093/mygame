@@ -297,74 +297,48 @@
             location.reload();
         }
 
-        function initSessiion() {
-    if (!currentUser) { document.getElementById('auth-modal').style.display = 'flex'; return; }
+  function initSession() {
+    if(!currentUser) { document.getElementById('auth-modal').style.display = 'flex'; return; }
     document.getElementById('auth-modal').style.display = 'none';
     document.getElementById('ui-username').innerText = currentUser;
 
-    // --- KÍCH HOẠT NÚT ADMIN KHI LÀ NDT999 ---
-    const btnAdmin = document.getElementById('btn-open-admin');
-    if (btnAdmin) {
-        if (currentUser === 'ndt999') {
-            btnAdmin.style.display = 'block';
-        } else {
-            btnAdmin.style.display = 'none';
-        }
-    }
-    // ------------------------------------------
-
-    // Lắng nghe thay đổi số dư theo đúng nhánh gốc (hỗ trợ cả ndt999 lẫn user thường trong users/)
-    const balanceRef = (currentUser === 'ndt999') ? db.ref('ndt999/balance') : db.ref('users/' + currentUser + '/balance');
-    
-    dbBalanceListener = balanceRef.on('value', snap => {
+    // Lắng nghe thay đổi số dư theo thời gian thực (Ai chuyển tiền là tự nhảy số)
+    dbBalanceListener = db.ref('users/' + currentUser + '/balance').on('value', snap => {
         if(snap.exists()) {
             currentBalance = snap.val();
             document.getElementById('ui-balance').innerText = currentBalance.toLocaleString();
-        } else {
-            currentBalance = 0;
-            document.getElementById('ui-balance').innerText = '0';
         }
     });
+
+    // Lắng nghe logs lịch sử
+    db.ref('users/' + currentUser + '/logs').orderByChild('time').limitToLast(15).on('value', snap => {
+        const logBoard = document.getElementById('ui-log');
+        logBoard.innerHTML = '';
+        let logs = [];
+        snap.forEach(child => { logs.push(child.val()); });
+        logs.reverse().forEach(l => {
+            let div = document.createElement('div');
+            div.className = 'log-item';
+            div.style.color = l.color || '#fff';
+            div.innerText = l.msg;
+            logBoard.appendChild(div);
+        });
+    });
+    
+    listenForTransactions(currentUser);
 }
-
-
-            // Lắng nghe logs lịch sử
-                const logsRef = (currentUser === 'ndt999') ? db.ref('ndt999/logs') : db.ref('users/' + currentUser + '/logs');
-    logsRef.orderByChild('time').limitToLast(15).on('value', snap => {
-
-
-                const logBoard = document.getElementById('ui-log');
-                logBoard.innerHTML = '';
-                let logs = [];
-                snap.forEach(child => { logs.push(child.val()); });
-                logs.reverse().forEach(l => {
-                    let div = document.createElement('div');
-                    div.className = 'log-item';
-                    div.style.color = l.color || '#fff';
-                    div.innerText = l.msg;
-                    logBoard.appendChild(div);
-                });
-            });
-             listenForTransactions(currentUser);
-        }
-
-        // Lưu log lên Firebase
-        function pushLog(msg, color) {
-    if (!currentUser) return;
-    const logRef = (currentUser === 'ndt999') ? db.ref('ndt999/logs').push() : db.ref('users/' + currentUser + '/logs').push();
+// Lưu log lên Firebase
+function pushLog(msg, color) {
+    if(!currentUser) return;
+    const logRef = db.ref('users/' + currentUser + '/logs').push();
     logRef.set({ msg: msg, color: color, time: Date.now() });
 }
 
-        // Cập nhật tiền lên DB (Thắng / Cược)
-        function updateDbBalance(newBalance) {
-    if (currentUser === 'ndt999') {
-        db.ref('ndt999/balance').set(newBalance);
-    } else {
-        db.ref('users/' + currentUser).update({ balance: newBalance });
-    }
-}
-
-
+// Cập nhật tiền lên DB (Thắng / Cược)
+function updateDbBalance(newBalance) {
+    db.ref('users/' + currentUser).update({ balance: newBalance });
+        }
+                
         // --- CHUYỂN TIỀN ONLINE ---
         function openTransferModal() { document.getElementById('transfer-modal').style.display = 'flex'; }
         function closeTransferModal() { document.getElementById('transfer-modal').style.display = 'none'; }
