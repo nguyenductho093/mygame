@@ -67,8 +67,8 @@
                     let msg = child.val();
                     let age = now - msg.timestamp;
                     
-                    // Lọc hiển thị: Chỉ hiện tin nhắn mới hơn 12 giờ (40.000.000 ms)
-                    if (age < 43200000) {
+                    // Lọc hiển thị: Chỉ hiện tin nhắn mới hơn 1 giờ (6.000.000 ms)
+                    if (age < 6000000) {
                         let div = document.createElement('div');
                         div.className = 'chat-msg';
                         div.innerHTML = `<span class="sender">[${msg.sender}]</span> ${msg.text}`;
