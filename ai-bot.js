@@ -2,12 +2,13 @@
 // FILE: ai-bot.js (AI Trợ Lý cho Kênh Thế Giới)
 // ==========================================
 
-const GEMINI_API_KEY = "AQ.Ab8RN6LawGMelsmH9OKwpKG4TKhirJp_cxk7M5yU119e7uo0ew"; 
+const GEMINI_API_KEY = "AQ.Ab8RN6K3DrM1BLWRrEZuqEehSXQOCQ3KN6n74Dd1QRZtvKD0PA"; 
 
 async function askGemini(userMessage) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    // Chuyển sang endpoint v1 và dùng gemini-1.5-flash chuẩn
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
     
-    const systemPrompt = `Bạn là 'AI TRỢ LÝ - Thọ', một trợ lý ảo thông minh, vui tính trong game cá cược. Hãy trả lời ngắn gọn (dưới 50 chữ) và dùng emoji. Câu hỏi: "${userMessage}"`;
+    const systemPrompt = `Bạn là 'AI TRỢ LÝ - Thọ', trợ lý ảo thông minh, vui tính trong game cá cược. Hãy trả lời ngắn gọn (dưới 50 chữ) và dùng emoji. Câu hỏi: "${userMessage}"`;
 
     const requestBody = {
         contents: [{
@@ -24,10 +25,6 @@ async function askGemini(userMessage) {
         
         const data = await response.json();
         
-        // In toàn bộ dữ liệu phản hồi từ Google ra F12 để kiểm tra
-        console.log("Phản hồi từ Gemini API:", data);
-
-        // Kiểm tra nếu API trả về lỗi cấu trúc hoặc khóa lỗi
         if (data.error) {
             console.error("Lỗi từ Google API:", data.error.message);
             return `Lỗi API: ${data.error.message}`;
@@ -36,7 +33,7 @@ async function askGemini(userMessage) {
         if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             return data.candidates[0].content.parts[0].text;
         } else {
-            return "AI đang lú chút do cấu trúc trả về lạ! 🤖";
+            return "AI đang lú chút, Hãy hỏi lại sau nha! 🤖";
         }
     } catch (error) {
         console.error("Lỗi mạng khi fetch:", error);
