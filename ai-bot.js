@@ -1,5 +1,5 @@
 // ==========================================================================
-// FILE: ai-bot.js (Bot Tự Động Kênh Thế Giới - Phiên Bản Hoàn Chỉnh & Thông Minh)
+// FILE: ai-bot.js (Bot Tự Động Kênh Thế Giới - Kèm Link Liên Hệ Facebook)
 // ==========================================================================
 
 // Ghi lại thời điểm trang vừa được load để ngăn bot trả lời dồn dập các tin cũ
@@ -9,7 +9,6 @@ const pageLoadTime = Date.now();
 const BOT_MESSAGE_LIFETIME = 60000; 
 
 db.ref('global_chat').on('child_added', async snap => {
-    const messageKey = snap.key; // Lấy ID duy nhất của tin nhắn trên Firebase
     const data = snap.val();
     
     // Kiểm tra tính hợp lệ: Nếu không có dữ liệu, thiếu nội dung, hoặc do chính bot gửi thì bỏ qua
@@ -48,15 +47,18 @@ db.ref('global_chat').on('child_added', async snap => {
     // Chọn ngẫu nhiên 1 câu từ danh sách
     const randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
 
+    // Gắn thêm dòng link liên hệ Facebook dạng thẻ HTML<a> để bấm vào là mở trực tiếp
+    const fbLinkHtml = `<br><a href="https://www.facebook.com/nguyenductho0903" target="_blank" style="color: #0084ff; text-decoration: underline; font-size: 13px;">🔗 Báo lỗi / Liên hệ Admin Facebook</a>`;
+    const fullMessageText = randomReply + fbLinkHtml;
+
     // Đẩy phản hồi của bot lên Firebase Realtime Database
     const newBotMsgRef = db.ref('global_chat').push({
         sender: 'AI TRỢ LÝ - Thọ',
-        text: randomReply,
+        text: fullMessageText,
         timestamp: Date.now()
     });
 
     // Thiết lập đồng hồ đếm ngược 60 giây để XÓA RIÊNG tin nhắn của bot khỏi Firebase
-    // Hoàn toàn không tác động hay ảnh hưởng gì đến tin nhắn của người dùng
     setTimeout(() => {
         newBotMsgRef.remove()
             .catch(error => {
